@@ -1,7 +1,10 @@
 import React from 'react';
-import { Link } from 'react-router-dom';
 
 export default function Narwhal() {
+    const logout = () => {
+        sessionStorage.clear();
+        window.location.href = '/';
+    };
     return (
         <>
             <main>
@@ -9,7 +12,9 @@ export default function Narwhal() {
                 <p>That feels like an existential question, don't you think?</p>
             </main>
             <nav>
-                <Link to="/">Home</Link>
+                <button id="logout" onClick={logout}>
+                    logout
+                </button>
             </nav>
         </>
     );
