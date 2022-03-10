@@ -1,5 +1,4 @@
 import React from 'react';
-import { useSelector, useDispatch } from 'react-redux';
 import { useAppDispatch, useAppSelector } from '../../hook/hooks';
 import {
     decrement,

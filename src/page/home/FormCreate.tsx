@@ -1,99 +1,121 @@
-import React, { useState } from 'react';
-import {
-    Form,
-    Input,
-    Button,
-    Radio,
-    Select,
-    Cascader,
-    DatePicker,
-    InputNumber,
-    TreeSelect,
-    Switch,
-} from 'antd';
+import React from 'react';
+import { Form, Input, InputNumber } from 'antd';
+interface IState {
+    email: string;
+    name: string;
+    avatar: string;
+    phone: string;
+    age: number;
+}
+export interface IRefFormCreate {
+    focus: () => void;
+    onSubmit: () => void;
+}
+interface IProps {}
+const initialState = {
+    email: '',
+    name: '',
+    avatar: '',
+    phone: '',
+    age: 0,
+};
+const FormCreate = React.forwardRef((props: IProps, ref: any) => {
+    const [form] = Form.useForm();
 
-export default function FormCreate() {
-    const [componentSize, setComponentSize] = useState(undefined);
-
-    const onFormLayoutChange = ({ size }: any) => {
-        setComponentSize(size);
-    };
-
+    const [{ email, name, avatar, phone, age }, setState] =
+        React.useState<IState>(initialState);
+    React.useImperativeHandle<IRefFormCreate, IRefFormCreate>(ref, () => ({
+        focus: () => {
+            form.resetFields(['email', 'name']);
+        },
+        onSubmit: () => {
+            // console.log('object');
+            console.log({ email, name, avatar, phone, age });
+        },
+    }));
+    React.useEffect(() => {
+        form.validateFields(['email']);
+    }, [email]);
     return (
-        <Form
-            labelCol={{
-                span: 4,
-            }}
-            wrapperCol={{
-                span: 20,
-            }}
-            layout="horizontal"
-            initialValues={{
-                size: componentSize,
-            }}
-            onValuesChange={onFormLayoutChange}
-            size={componentSize}
-        >
-            <Form.Item label="Form Size" name="size">
-                <Radio.Group>
-                    <Radio.Button value="small">Small</Radio.Button>
-                    <Radio.Button value="default">Default</Radio.Button>
-                    <Radio.Button value="large">Large</Radio.Button>
-                </Radio.Group>
-            </Form.Item>
-            <Form.Item label="Input">
-                <Input />
-            </Form.Item>
-            <Form.Item label="Select">
-                <Select>
-                    <Select.Option value="demo">Demo</Select.Option>
-                </Select>
-            </Form.Item>
-            <Form.Item label="TreeSelect">
-                <TreeSelect
-                    treeData={[
-                        {
-                            title: 'Light',
-                            value: 'light',
-                            children: [
-                                {
-                                    title: 'Bamboo',
-                                    value: 'bamboo',
-                                },
-                            ],
-                        },
-                    ]}
+        <Form layout={'inline'} form={form} name="dynamic_rule">
+            <Form.Item
+                rules={[
+                    {
+                        type: 'email',
+                        message: 'The input is not valid E-mail!',
+                    },
+                    {
+                        required: true,
+                        message: 'Please input Email',
+                    },
+                ]}
+                label="Email"
+                name={'email'}
+                colon={false}
+            >
+                <Input
+                    placeholder="Email"
+                    value={email}
+                    onChange={(value) => {
+                        setState((pre) => ({
+                            ...pre,
+                            email: value.target.value,
+                        }));
+                    }}
                 />
             </Form.Item>
-            <Form.Item label="Cascader">
-                <Cascader
-                    options={[
-                        {
-                            value: 'zhejiang',
-                            label: 'Zhejiang',
-                            children: [
-                                {
-                                    value: 'hangzhou',
-                                    label: 'Hangzhou',
-                                },
-                            ],
-                        },
-                    ]}
+            <Form.Item label="Name" name={'name'}>
+                <Input
+                    placeholder="Name"
+                    value={name}
+                    onChange={(value) => {
+                        setState((pre) => ({
+                            ...pre,
+                            name: value.target.value,
+                        }));
+                    }}
                 />
             </Form.Item>
-            <Form.Item label="DatePicker">
-                <DatePicker />
+            <Form.Item label="Phone" name={'phone'}>
+                <Input
+                    placeholder="Phone"
+                    value={phone}
+                    onChange={(value) => {
+                        setState((pre) => ({
+                            ...pre,
+                            phone: value.target.value,
+                        }));
+                    }}
+                />
             </Form.Item>
-            <Form.Item label="InputNumber">
-                <InputNumber />
+            <Form.Item label="Age" name={'age'}>
+                <InputNumber
+                    placeholder="Age"
+                    min={20}
+                    max={100}
+                    defaultValue={20}
+                    value={age}
+                    onChange={(value) => {
+                        setState((pre) => ({
+                            ...pre,
+                            age: value,
+                        }));
+                    }}
+                />
             </Form.Item>
-            <Form.Item label="Switch" valuePropName="checked">
-                <Switch />
-            </Form.Item>
-
-            <Form.Item label="Button">
-                <Button>Button</Button>
+            <Form.Item label="Avatar" name={'avatar'}>
+                <Input
+                    placeholder="avatar"
+                    value={avatar}
+                    onChange={(value) => {
+                        setState((pre) => ({
+                            ...pre,
+                            avatar: value.target.value,
+                        }));
+                    }}
+                />
             </Form.Item>
         </Form>
     );
-}
+});
+export default FormCreate;

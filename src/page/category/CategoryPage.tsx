@@ -75,7 +75,7 @@ export default function CategoryPage() {
             data: jsonData.results,
             pagination: {
                 ...params.pagination,
-                total: 10000,
+                total: 100,
             },
         }));
     };
@@ -84,7 +84,6 @@ export default function CategoryPage() {
         filters: any,
         sorter: any
     ) => {
-        console.log(sorter);
         fetch1({
             sortField: sorter.field,
             sortOrder: sorter.order,
@@ -95,6 +94,7 @@ export default function CategoryPage() {
     React.useEffect(() => {
         fetch1({ pagination });
     }, []);
+
     return (
         <Table
             bordered

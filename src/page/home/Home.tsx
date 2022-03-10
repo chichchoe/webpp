@@ -12,7 +12,7 @@ import {
     Space,
     Image,
 } from 'antd';
-import FormCreate from './FormCreate';
+import FormCreate, { IRefFormCreate } from './FormCreate';
 import faker from '@faker-js/faker/locale/de';
 const originData: any[] | (() => any[]) = [];
 
@@ -68,16 +68,19 @@ export default function HomePage() {
     const [data, setData] = useState(originData);
     const [editingKey, setEditingKey] = useState('');
     const [isModalVisible, setIsModalVisible] = useState(false);
+    const refContainer = React.useRef<IRefFormCreate>(null);
 
     const showModal = () => {
         setIsModalVisible(true);
     };
 
     const handleOk = () => {
-        setIsModalVisible(false);
+        refContainer.current?.onSubmit();
+        // setIsModalVisible(false);
     };
 
     const handleCancel = () => {
+        refContainer.current?.focus();
         setIsModalVisible(false);
     };
 
@@ -249,12 +252,13 @@ export default function HomePage() {
             </Form>
             <Modal
                 width="50%"
+                keyboard
                 title="Create a new"
                 visible={isModalVisible}
                 onOk={handleOk}
                 onCancel={handleCancel}
             >
-                <FormCreate />
+                <FormCreate ref={refContainer} />
             </Modal>
         </div>
     );

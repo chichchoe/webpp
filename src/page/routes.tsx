@@ -16,7 +16,7 @@ import {
 import { Link } from 'react-router-dom';
 import CategoryPage from './category/CategoryPage';
 
-const { Header, Content, Sider } = Layout;
+const { Content, Sider } = Layout;
 const { SubMenu } = Menu;
 const initialState = {
     isCollapsed: false,
