@@ -1,5 +1,5 @@
 import React from 'react';
-import { Table } from 'antd';
+import { Table, Image } from 'antd';
 import qs from 'qs';
 import { TablePaginationConfig } from 'antd/lib/table/interface';
 
@@ -19,11 +19,23 @@ const columns = [
             { text: 'Male', value: 'male' },
             { text: 'Female', value: 'female' },
         ],
-        width: '20%',
+    },
+    {
+        title: 'Age',
+        dataIndex: 'dob',
+        render: (dob: { date: string; age: number }) => `${dob.age} `,
+    },
+    {
+        title: 'Avatar',
+        dataIndex: 'picture',
+        render: (picture: { large: string }) => {
+            return <Image preview={false} src={picture.large} width={45} />;
+        },
     },
     {
         title: 'Email',
         dataIndex: 'email',
+        width: '100%',
     },
 ];
 
@@ -85,6 +97,7 @@ export default function CategoryPage() {
     }, []);
     return (
         <Table
+            bordered
             columns={columns}
             rowKey={(record: any) => record.login.uuid}
             dataSource={data}

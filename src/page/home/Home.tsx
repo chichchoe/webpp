@@ -140,7 +140,7 @@ export default function HomePage() {
                     <Image
                         preview={false}
                         src={data[record.key].avatar}
-                        width={100}
+                        width={50}
                     />
                 );
             },

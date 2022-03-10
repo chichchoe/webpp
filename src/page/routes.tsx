@@ -91,10 +91,10 @@ function RouterPage() {
                 </Menu>
             </Sider>
             <Layout className="site-layout">
-                <Header
+                {/* <Header
                     className="site-layout-background"
                     style={{ padding: 0, backgroundColor: 'gray' }}
-                />
+                /> */}
                 <Content style={{ margin: '0 16px' }}>
                     <Routes>
                         <Route path="" element={<HomePage />} />
