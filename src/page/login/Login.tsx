@@ -29,6 +29,7 @@ export default function Login(props: Iprops) {
                     <label>
                         <p>Username</p>
                         <input
+                            className="formLogin"
                             type="text"
                             placeholder={'Username'}
                             onChange={(e) =>
@@ -42,6 +43,7 @@ export default function Login(props: Iprops) {
                     <label>
                         <p>Password</p>
                         <input
+                            className="formLogin"
                             type="password"
                             placeholder={'Password'}
                             onChange={(e) =>

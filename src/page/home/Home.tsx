@@ -2,8 +2,6 @@ import React, { useState } from 'react';
 
 import {
     Table,
-    Input,
-    InputNumber,
     Popconfirm,
     Form,
     Typography,
@@ -11,67 +9,29 @@ import {
     Modal,
     Space,
     Image,
+    TablePaginationConfig,
 } from 'antd';
 import FormCreate, { IRefFormCreate } from './FormCreate';
 import faker from '@faker-js/faker/locale/de';
-const originData: any[] | (() => any[]) = [];
+import dataJSON from '../../config/json/data.json';
 
-for (let i = 0; i < 20; i++) {
-    originData.push({
-        key: i.toString(),
-        email: faker.internet.email(),
-        name: faker.internet.userName(),
-        avatar: faker.image.avatar(),
-        phone: faker.phone.phoneNumber(),
-        age: faker.datatype.number({ min: 20, max: 40 }),
-        address: faker.address.city(),
-    });
+const filtersAge: any = [];
+for (let index = 0; index < 100; index++) {
+    filtersAge.push({ text: index.toString(), value: index });
 }
-
-const EditableCell = ({
-    editing,
-    dataIndex,
-    title,
-    inputType,
-    record,
-    index,
-    children,
-    ...restProps
-}: any) => {
-    const inputNode = inputType === 'number' ? <InputNumber /> : <Input />;
-    return (
-        <td {...restProps}>
-            {editing ? (
-                <Form.Item
-                    name={dataIndex}
-                    style={{
-                        margin: 0,
-                    }}
-                    rules={[
-                        {
-                            required: true,
-                            message: `Please Input ${title}!`,
-                        },
-                    ]}
-                >
-                    {inputNode}
-                </Form.Item>
-            ) : (
-                children
-            )}
-        </td>
-    );
-};
 
 export default function HomePage() {
     const [form] = Form.useForm();
-    const [data, setData] = useState(originData);
-    const [editingKey, setEditingKey] = useState('');
+    const [data, setData] = useState<any>([]);
     const [isModalVisible, setIsModalVisible] = useState(false);
+    const [isLoading, setloading] = useState(false);
     const refContainer = React.useRef<IRefFormCreate>(null);
 
-    const showModal = () => {
+    const showModal = (numberEditRow?: number) => {
         setIsModalVisible(true);
+        if (numberEditRow) {
+            refContainer.current?.onEditRow(data[numberEditRow]);
+        }
     };
 
     const handleOk = () => {
@@ -84,60 +44,29 @@ export default function HomePage() {
         setIsModalVisible(false);
     };
 
-    const isEditing = (record: { key: string }) => record.key === editingKey;
-
-    const edit = (record: { key: React.SetStateAction<string> }) => {
-        form.setFieldsValue({
-            name: '',
-            age: '',
-            address: '',
-            ...record,
-        });
-        setEditingKey(record.key);
+    const paginating = (page: number, pageSize: number) => {
+        console.log(page);
+        console.log(pageSize);
     };
 
-    const cancel = () => {
-        setEditingKey('');
-    };
-
-    const save = async (key: any) => {
-        try {
-            const row = await form.validateFields();
-            const newData = [...data];
-            const index = newData.findIndex((item) => key === item.key);
-
-            if (index > -1) {
-                const item = newData[index];
-                newData.splice(index, 1, { ...item, ...row });
-                setData(newData);
-                setEditingKey('');
-            } else {
-                newData.push(row);
-                setData(newData);
-                setEditingKey('');
-            }
-        } catch (errInfo) {
-            console.log('Validate Failed:', errInfo);
-        }
-    };
-
-    const columns = [
+    const columns: any = [
         {
             title: 'Email',
             dataIndex: 'email',
             sorter: true,
-            editable: true,
+            width: 300,
         },
         {
             title: 'Name',
             dataIndex: 'name',
             sorter: true,
-            editable: true,
+            width: 300,
         },
         {
             title: 'Avatar',
             dataIndex: 'avatar',
             editable: false,
+            width: 90,
             render: (_: any, record: { key: any }) => {
                 return (
                     <Image
@@ -152,46 +81,29 @@ export default function HomePage() {
             title: 'Phone',
             sorter: true,
             dataIndex: 'phone',
-            width: '20%',
-            editable: true,
+            width: 200,
         },
         {
             title: 'Age',
             sorter: true,
             dataIndex: 'age',
-            editable: true,
+            width: 100,
+            filters: filtersAge,
         },
         {
             title: 'Address',
             dataIndex: 'address',
-            width: '100%',
-            editable: true,
+            width: 1000,
         },
         {
             title: 'Operation',
             dataIndex: 'operation',
+            fixed: 'right',
+            width: 100,
             render: (_: any, record: { key: any }) => {
-                const editable = isEditing(record);
-                return editable ? (
-                    <span>
-                        <Typography.Link
-                            onClick={() => save(record.key)}
-                            style={{
-                                marginRight: 8,
-                            }}
-                        >
-                            Save
-                        </Typography.Link>
-                        <Popconfirm title="Sure to cancel?" onConfirm={cancel}>
-                            <a>Cancel</a>
-                        </Popconfirm>
-                    </span>
-                ) : (
+                return (
                     <Space>
-                        <Typography.Link
-                            disabled={editingKey !== ''}
-                            onClick={() => edit(record)}
-                        >
+                        <Typography.Link onClick={() => showModal(record.key)}>
                             Edit
                         </Typography.Link>
                         <Popconfirm
@@ -205,49 +117,69 @@ export default function HomePage() {
             },
         },
     ];
-    const mergedColumns = columns.map((col) => {
-        if (!col.editable) {
-            return col;
-        }
-
-        return {
-            ...col,
-            onCell: (record: { key: string }) => ({
-                record,
-                inputType: col.dataIndex === 'age' ? 'number' : 'text',
-                dataIndex: col.dataIndex,
-                title: col.title,
-                editing: isEditing(record),
-            }),
-        };
-    });
+    React.useEffect(() => {
+        setData(dataJSON.data);
+    }, []);
     return (
         <div id="container">
             <Form form={form} component={false}>
                 <Table
                     scroll={{ x: '100%' }}
-                    components={{
-                        body: {
-                            cell: EditableCell,
-                        },
-                    }}
                     title={() => {
                         return (
-                            <Button type="primary" onClick={showModal}>
+                            <Button type="primary" onClick={() => showModal()}>
                                 Create a new
                             </Button>
                         );
                     }}
                     onRow={(r) => ({
-                        onClick: () => console.log(r.key),
+                        onClick: () => showModal(r.key),
                     })}
                     bordered
                     dataSource={data}
-                    columns={mergedColumns}
+                    columns={columns}
                     rowClassName="editable-row"
                     pagination={{
-                        onChange: cancel,
+                        onChange: paginating,
                     }}
+                    onChange={(
+                        pagination: TablePaginationConfig,
+                        filters: any,
+                        sorter: any
+                    ) => {
+                        console.log(filters);
+                        console.log(sorter);
+                        if (sorter.field === 'age') {
+                            setData(
+                                data.sort((a: any, b: any) => {
+                                    return sorter.order === 'ascend'
+                                        ? a.age - b.age
+                                        : b.age - a.age;
+                                })
+                            );
+                            setloading(true);
+                            const clean = setTimeout(() => {
+                                setloading(false);
+                                clearTimeout(clean);
+                            }, 1000);
+                        }
+                        // sort name
+                        if (sorter.field === 'name') {
+                            setData(
+                                data.sort((a: any, b: any) => {
+                                    return sorter.order === 'ascend'
+                                        ? a.name - b.name
+                                        : b.name - a.name;
+                                })
+                            );
+                            setloading(true);
+                            const clean = setTimeout(() => {
+                                setloading(false);
+                                clearTimeout(clean);
+                            }, 1000);
+                        }
+                    }}
+                    loading={isLoading}
                 />
             </Form>
             <Modal
