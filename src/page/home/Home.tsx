@@ -12,8 +12,8 @@ import {
     TablePaginationConfig,
 } from 'antd';
 import FormCreate, { IRefFormCreate } from './FormCreate';
-import faker from '@faker-js/faker/locale/de';
 import dataJSON from '../../config/json/data.json';
+import Utilities from '../../utils/Utilities';
 
 const filtersAge: any = [];
 for (let index = 0; index < 100; index++) {
@@ -68,10 +68,14 @@ export default function HomePage() {
             editable: false,
             width: 90,
             render: (_: any, record: { key: any }) => {
+                console.log(data[record.key]);
                 return (
                     <Image
                         preview={false}
-                        src={data[record.key].avatar}
+                        src={
+                            data[record.key]?.avatar ||
+                            'https://cloudflare-ipfs.com/ipfs/Qmd3W5DuhgHirLHGVixi6V76LhCkZUz6pnFt5AJBiyvHye/avatar/1043.jpg'
+                        }
                         width={50}
                     />
                 );
@@ -117,9 +121,46 @@ export default function HomePage() {
             },
         },
     ];
+
+    const onChangeTable = async (
+        pagination: TablePaginationConfig,
+        filters: any,
+        sorter: any
+    ) => {
+        console.log(filters);
+        if (sorter.field === 'age') {
+            setData(
+                data.sort((a: any, b: any) => {
+                    return sorter.order === 'ascend'
+                        ? a.age - b.age
+                        : b.age - a.age;
+                })
+            );
+            setloading(true);
+            await Utilities.waitTime(2000);
+            setloading(false);
+        }
+        if (filters.age && filters.age.length > 0) {
+            let dataFilter: any = [];
+            filters.age.forEach((item: any) => {
+                dataFilter = [
+                    ...dataFilter,
+                    ...dataJSON.data.filter((data: any) => data.age === item),
+                ];
+            });
+
+            setData(dataFilter);
+            setloading(true);
+            await Utilities.waitTime(2000);
+            setloading(false);
+        }
+        console.log(sorter.field);
+    };
+
     React.useEffect(() => {
         setData(dataJSON.data);
     }, []);
+    console.log(data);
     return (
         <div id="container">
             <Form form={form} component={false}>
@@ -142,43 +183,7 @@ export default function HomePage() {
                     pagination={{
                         onChange: paginating,
                     }}
-                    onChange={(
-                        pagination: TablePaginationConfig,
-                        filters: any,
-                        sorter: any
-                    ) => {
-                        console.log(filters);
-                        console.log(sorter);
-                        if (sorter.field === 'age') {
-                            setData(
-                                data.sort((a: any, b: any) => {
-                                    return sorter.order === 'ascend'
-                                        ? a.age - b.age
-                                        : b.age - a.age;
-                                })
-                            );
-                            setloading(true);
-                            const clean = setTimeout(() => {
-                                setloading(false);
-                                clearTimeout(clean);
-                            }, 1000);
-                        }
-                        // sort name
-                        if (sorter.field === 'name') {
-                            setData(
-                                data.sort((a: any, b: any) => {
-                                    return sorter.order === 'ascend'
-                                        ? a.name - b.name
-                                        : b.name - a.name;
-                                })
-                            );
-                            setloading(true);
-                            const clean = setTimeout(() => {
-                                setloading(false);
-                                clearTimeout(clean);
-                            }, 1000);
-                        }
-                    }}
+                    onChange={onChangeTable}
                     loading={isLoading}
                 />
             </Form>

@@ -10,6 +10,7 @@ import {
 } from 'chart.js';
 import { Bar } from 'react-chartjs-2';
 import faker from '@faker-js/faker/locale/de';
+import Utilities from '../../utils/Utilities';
 
 ChartJS.register(
     CategoryScale,
@@ -33,24 +34,21 @@ export const options = {
     },
 };
 
-const labels = ['January', 'February', 'March', 'April', 'May', 'June', 'July'];
+let labels = [];
+
+for (let index = 0; index < Utilities.daysInMonth(3, 2022); index++) {
+    labels.push(`${index}-03`);
+}
 
 export const data = {
     labels,
     datasets: [
         {
-            label: 'Dataset 1',
+            label: 'SLSP trong ngay',
             data: labels.map(() =>
-                faker.datatype.number({ min: 0, max: 1000 })
+                faker.datatype.number({ min: 300, max: 1000 })
             ),
-            backgroundColor: 'rgba(255, 99, 132, 0.5)',
-        },
-        {
-            label: 'Dataset 2',
-            data: labels.map(() =>
-                faker.datatype.number({ min: 0, max: 1000 })
-            ),
-            backgroundColor: 'rgba(53, 162, 235, 0.5)',
+            backgroundColor: 'rgba(83, 135, 225, 0.8)',
         },
     ],
 };

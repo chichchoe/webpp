@@ -15,6 +15,7 @@ import {
 } from '@ant-design/icons';
 import { Link } from 'react-router-dom';
 import CategoryPage from './category/CategoryPage';
+import PriceSetting from './priceSetting/priceSetting';
 
 const { Content, Sider } = Layout;
 const { SubMenu } = Menu;
@@ -80,8 +81,11 @@ function RouterPage() {
                     <Menu.Item key="9" icon={<FileOutlined />}>
                         <Link to="/Profile">Profile</Link>
                     </Menu.Item>
+                    <Menu.Item key="10" icon={<FileOutlined />}>
+                        <Link to="/PriceSetting">Profile</Link>
+                    </Menu.Item>
                     <Menu.Item
-                        key="10"
+                        key="11"
                         style={{ color: 'red' }}
                         icon={<LoginOutlined />}
                         onClick={logout}
@@ -101,6 +105,7 @@ function RouterPage() {
                         <Route path="Narwhal" element={<DetailPage />} />
                         <Route path="Profile" element={<ProfilePage />} />
                         <Route path="Category" element={<CategoryPage />} />
+                        <Route path="PriceSetting" element={<PriceSetting />} />
                     </Routes>
                 </Content>
             </Layout>
